@@ -1,0 +1,18 @@
+# https://www.npmjs.com/package/rest-cli?activeTab=readme
+# npm install -g rest-cli
+#  restcli --show body ./test/create_todos.http
+@base_url=http://localhost:8080
+# @name auth
+GET {{base_url}}/tokenz
+
+###
+@token = {{auth.response.body.$.token}}
+
+###
+POST {{base_url}}/todos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "text": "test 6"
+}

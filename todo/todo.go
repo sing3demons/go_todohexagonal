@@ -2,7 +2,6 @@ package todo
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -17,12 +16,16 @@ func (Todo) TableName() string {
 	return "todos"
 }
 
-type TodoHandler struct {
-	db *gorm.DB
+type storer interface {
+	New(*Todo) error
 }
 
-func NewTodoHandler(db *gorm.DB) *TodoHandler {
-	return &TodoHandler{db: db}
+type TodoHandler struct {
+	store storer
+}
+
+func NewTodoHandler(store storer) *TodoHandler {
+	return &TodoHandler{store: store}
 }
 
 func (t *TodoHandler) NewTask(c *gin.Context) {
@@ -34,7 +37,7 @@ func (t *TodoHandler) NewTask(c *gin.Context) {
 		return
 	}
 
-	if err := t.db.Create(&todo).Error; err != nil {
+	if err := t.store.New(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -46,33 +49,33 @@ func (t *TodoHandler) NewTask(c *gin.Context) {
 	})
 }
 
-func (t *TodoHandler) List(c *gin.Context) {
-	var todos []Todo
-	if err := t.db.Find(&todos).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusCreated, todos)
-}
+// func (t *TodoHandler) List(c *gin.Context) {
+// 	var todos []Todo
+// 	if err := t.db.Find(&todos).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	c.JSON(http.StatusCreated, todos)
+// }
 
-func (t *TodoHandler) Remove(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	if err := t.db.Delete(&Todo{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{
-		"status": "success",
-	})
+// func (t *TodoHandler) Remove(c *gin.Context) {
+// 	id, err := strconv.Atoi(c.Param("id"))
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	if err := t.db.Delete(&Todo{}, id).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"error": err.Error(),
+// 		})
+// 		return
+// 	}
+// 	c.JSON(http.StatusCreated, gin.H{
+// 		"status": "success",
+// 	})
 
-}
+// }

@@ -72,8 +72,9 @@ func main() {
 			"buildtime":   buildtime,
 		})
 	})
-	
-	handler := todo.NewTodoHandler(db)
+
+	gormStore := todo.NewGormStore(db)
+	handler := todo.NewTodoHandler(gormStore)
 	r.POST("/todos", handler.NewTask)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

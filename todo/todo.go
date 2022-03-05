@@ -29,9 +29,14 @@ func NewTodoHandler(store storer) *TodoHandler {
 	return &TodoHandler{store: store}
 }
 
-func (t *TodoHandler) NewTask(c *gin.Context) {
+type Context interface {
+	Bind(interface{}) error
+	JSON(int, interface{}) 
+}
+
+func (t *TodoHandler) NewTask(c Context) {
 	var todo Todo
-	if err := c.ShouldBindJSON(&todo); err != nil {
+	if err := c.Bind(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -50,7 +55,7 @@ func (t *TodoHandler) NewTask(c *gin.Context) {
 	})
 }
 
-func (t *TodoHandler) List(c *gin.Context) {
+func (t *TodoHandler) List(c Context) {
 	var todos []Todo
 	if err := t.store.List(&todos); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

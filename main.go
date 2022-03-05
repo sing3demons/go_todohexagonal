@@ -76,6 +76,8 @@ func main() {
 	gormStore := todo.NewGormStore(db)
 	handler := todo.NewTodoHandler(gormStore)
 	r.POST("/todos", handler.NewTask)
+	r.GET("/todos", handler.List)
+	
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()

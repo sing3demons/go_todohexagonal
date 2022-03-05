@@ -18,6 +18,7 @@ func (Todo) TableName() string {
 
 type storer interface {
 	New(*Todo) error
+	List(*[]Todo) error
 }
 
 type TodoHandler struct {
@@ -49,16 +50,16 @@ func (t *TodoHandler) NewTask(c *gin.Context) {
 	})
 }
 
-// func (t *TodoHandler) List(c *gin.Context) {
-// 	var todos []Todo
-// 	if err := t.db.Find(&todos).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusCreated, todos)
-// }
+func (t *TodoHandler) List(c *gin.Context) {
+	var todos []Todo
+	if err := t.store.List(&todos); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusCreated, todos)
+}
 
 // func (t *TodoHandler) Remove(c *gin.Context) {
 // 	id, err := strconv.Atoi(c.Param("id"))

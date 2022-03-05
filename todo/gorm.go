@@ -17,3 +17,7 @@ func (s *GormStore) New(todo *Todo) error {
 func (s *GormStore) List(todos *[]Todo) error {
 	return s.db.Find(todos).Error
 }
+
+func (s *GormStore) Delete(todo *Todo, id int) error {
+	return s.db.Delete(todo,id).Error
+}

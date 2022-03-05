@@ -17,6 +17,10 @@ func (c *MyContext) JSON(code int, v interface{}) {
 	c.Context.JSON(code, v)
 }
 
+func (c *MyContext) Param(key string) string{
+	return c.Context.Param(key)
+}
+
 func NewMyHandler(handler func(Context)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		handler(NewMyContext(c))

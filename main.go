@@ -13,6 +13,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/sing3demons/todoapi/router"
+	"github.com/sing3demons/todoapi/store"
 	"github.com/sing3demons/todoapi/todo"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -73,11 +75,11 @@ func main() {
 		})
 	})
 
-	gormStore := todo.NewGormStore(db)
+	gormStore := store.NewGormStore(db)
 	handler := todo.NewTodoHandler(gormStore)
 
-	r.POST("/todos", todo.NewMyHandler(handler.NewTask))
-	r.GET("/todos", todo.NewMyHandler(handler.List))
+	r.POST("/todos", router.NewMyHandler(handler.NewTask))
+	r.GET("/todos", router.NewMyHandler(handler.List))
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()

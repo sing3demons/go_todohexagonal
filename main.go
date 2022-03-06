@@ -10,8 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sing3demons/todoapi/router"
 	"github.com/sing3demons/todoapi/store"
@@ -46,30 +44,31 @@ func main() {
 
 	db.AutoMigrate(&todo.Todo{})
 
-	r := gin.Default()
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{
-		"http://localhost:8081",
-	}
-	config.AllowHeaders = []string{
-		"Origin",
-		"Authorization",
-	}
+	// r := gin.Default()
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{
+	// 	"http://localhost:8081",
+	// }
+	// config.AllowHeaders = []string{
+	// 	"Origin",
+	// 	"Authorization",
+	// }
 
-	r.Use(cors.New(config))
+	// r.Use(cors.New(config))
+	r := router.NewMyRouter()
 
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
+	r.GET("/", func(ctx todo.Context) {
+		ctx.JSON(200, map[string]interface{}{
 			"message": "hello world",
 		})
 	})
 
-	r.GET("/healthz", func(ctx *gin.Context) {
+	r.GET("/healthz", func(ctx todo.Context) {
 		ctx.Status(200)
 	})
 
-	r.GET("x", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
+	r.GET("x", func(ctx todo.Context) {
+		ctx.JSON(200, map[string]interface{}{
 			"buildcommit": buildcommit,
 			"buildtime":   buildtime,
 		})
@@ -78,8 +77,8 @@ func main() {
 	gormStore := store.NewGormStore(db)
 	handler := todo.NewTodoHandler(gormStore)
 
-	r.POST("/todos", router.NewMyHandler(handler.NewTask))
-	r.GET("/todos", router.NewMyHandler(handler.List))
+	r.POST("/todos", handler.NewTask)
+	r.GET("/todos", handler.List)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()

@@ -1,20 +1,19 @@
 package todo
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-type DeletedAt sql.NullTime
+// type DeletedAt sql.NullTime
 
 type Todo struct {
 	Title     string `json:"text" binding:"required"`
 	ID        uint   `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt DeletedAt `gorm:"index"`
+	// DeletedAt DeletedAt `gorm:"index"`
 }
 
 func (Todo) TableName() string {
@@ -39,6 +38,7 @@ type Context interface {
 	Bind(interface{}) error
 	JSON(int, interface{})
 	Param(string) string
+	Status(code int)
 }
 
 func (t *TodoHandler) NewTask(c Context) {

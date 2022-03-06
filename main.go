@@ -36,7 +36,8 @@ func main() {
 	}
 	defer os.Remove("/tmp/live")
 
-	r := router.NewMyRouter()
+	// r := router.NewMyRouter()
+	r := router.NewFiberRouter()
 
 	r.GET("/", func(ctx todo.Context) {
 		ctx.JSON(200, map[string]interface{}{
@@ -66,19 +67,12 @@ func main() {
 	r.POST("/todos", handler.NewTask)
 	r.GET("/todos", handler.List)
 
+	//Graceful Shutdown
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	serve := &http.Server{
-		Addr:           ":" + os.Getenv("PORT"),
-		Handler:        r,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-
 	go func() {
-		if err := serve.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := r.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
@@ -87,10 +81,7 @@ func main() {
 	stop()
 	fmt.Println("shutting down gracefully, press Ctrl+C again to force")
 
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := serve.Shutdown(timeoutCtx); err != nil {
+	if err := r.Shutdown(); err != nil {
 		fmt.Println(err)
 	}
 }

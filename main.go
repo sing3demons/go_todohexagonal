@@ -11,14 +11,10 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/sing3demons/todoapi/database"
 	"github.com/sing3demons/todoapi/router"
 	"github.com/sing3demons/todoapi/store"
 	"github.com/sing3demons/todoapi/todo"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -40,28 +36,6 @@ func main() {
 	}
 	defer os.Remove("/tmp/live")
 
-	db, err := gorm.Open(mysql.Open(os.Getenv("DB_CONN")), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	db.AutoMigrate(&todo.Todo{})
-
-	uri := "mongodb://root:admin1234@localhost:27017"
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	if err != nil {
-		panic(err)
-	}
-	if err := client.Ping(ctx, readpref.Primary()); err != nil {
-		panic(err)
-	}
-
-	collection := client.Database("go-todo").Collection("todos")
-	
-
-
 	r := router.NewMyRouter()
 
 	r.GET("/", func(ctx todo.Context) {
@@ -81,10 +55,13 @@ func main() {
 		})
 	})
 
-	gormStore := store.NewGormStore(db)
-	_ = gormStore
-	mongo := store.NewMongoStore(collection)
-	handler := todo.NewTodoHandler(mongo)
+	database.InitDB()
+	db := database.GetDB()
+	store := store.NewGormStore(db)
+
+	// collection := database.Collection()
+	// store := store.NewMongoStore(collection)
+	handler := todo.NewTodoHandler(store)
 
 	r.POST("/todos", handler.NewTask)
 	r.GET("/todos", handler.List)

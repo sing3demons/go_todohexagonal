@@ -72,10 +72,7 @@ func (r *FiberRouter) POST(path string, handler func(todo.Context)) {
 // }
 
 func (r *FiberRouter) GET(path string, handler func(todo.Context)) {
-	r.App.Get(path, func(c *fiber.Ctx) error {
-		handler(NewFiberCtx(c))
-		return nil
-	})
+	r.App.Get(path, NewFiberHandler(handler))
 }
 
 func (r *FiberRouter) ListenAndServe() error {

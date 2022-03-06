@@ -36,8 +36,8 @@ func main() {
 	}
 	defer os.Remove("/tmp/live")
 
-	// r := router.NewMyRouter()
-	r := router.NewFiberRouter()
+	r := router.NewMyRouter()
+	// r := router.NewFiberRouter()
 
 	r.GET("/", func(ctx todo.Context) {
 		ctx.JSON(200, map[string]interface{}{

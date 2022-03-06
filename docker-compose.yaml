@@ -9,3 +9,14 @@ services:
       environment:
        - MONGO_INITDB_ROOT_USERNAME=root
        - MONGO_INITDB_ROOT_PASSWORD=admin1234
+    mariadb:
+     image: mariadb:latest
+     container_name: mariadb
+     ports:
+       - 3306:3306
+     restart: always
+     environment:
+       - MARIADB_ROOT_PASSWORD=my-secret-pw
+       - MARIADB_DATABASE=myapp
+
+      

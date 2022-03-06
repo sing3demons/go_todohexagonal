@@ -59,10 +59,15 @@ func NewMyRouter() *MyRouter {
 func (r *MyRouter) POST(path string, handler func(todo.Context)) {
 	r.Engine.POST(path, NewMyHandler(handler))
 }
-
 func (r *MyRouter) GET(path string, handler func(todo.Context)) {
-	r.Engine.GET(path, NewMyHandler(handler))
+	r.Engine.GET(path, func(ctx *gin.Context) {
+		handler(ctx)
+	})
 }
+
+// func (r *MyRouter) GET(path string, handler func(todo.Context)) {
+// 	r.Engine.GET(path, NewMyHandler(handler))
+// }
 
 func (r *MyRouter) ListenAndServe() error {
 	serve := &http.Server{

@@ -13,7 +13,7 @@ type MongoStore struct {
 	*mongo.Collection
 }
 
-func NewMongoStore(col *mongo.Collection) *MongoStore {
+func NewMongoStore(col *mongo.Collection) Storer {
 	return &MongoStore{Collection: col}
 }
 

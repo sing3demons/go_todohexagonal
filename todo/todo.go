@@ -70,7 +70,7 @@ func (t *TodoHandler) List(c Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusCreated, todos)
+	c.JSON(http.StatusOK, todos)
 }
 
 func (t *TodoHandler) Remove(c Context) {
@@ -87,7 +87,7 @@ func (t *TodoHandler) Remove(c Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusCreated, map[string]interface{}{
+	c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "success",
 	})
 

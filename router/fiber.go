@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -64,13 +65,6 @@ func (r *FiberRouter) POST(path string, handler func(todo.Context)) {
 	r.App.Post(path, NewFiberHandler(handler))
 }
 
-// func (r *FiberRouter) POST(path string, handler func(todo.Context)) {
-// 	r.App.Post(path, func(c *fiber.Ctx) error {
-// 		handler(NewFiberCtx(c))
-// 		return nil
-// 	})
-// }
-
 func (r *FiberRouter) GET(path string, handler func(todo.Context)) {
 	r.App.Get(path, NewFiberHandler(handler))
 }
@@ -81,4 +75,8 @@ func (r *FiberRouter) ListenAndServe() error {
 
 func (r *FiberRouter) Shutdown() error {
 	return r.App.Shutdown()
+}
+
+func (r *FiberRouter) Test(req *http.Request, msTimeout ...int) (resp *http.Response, err error) {
+	return r.App.Test(req, msTimeout...)
 }

@@ -81,3 +81,7 @@ func (r *MyRouter) Shutdown() error {
 	s := &http.Server{}
 	return s.Shutdown(timeoutCtx)
 }
+
+func (r *MyRouter) Test(w http.ResponseWriter, req *http.Request) {
+	r.Engine.ServeHTTP(w, req)
+}
